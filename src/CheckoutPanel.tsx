@@ -494,7 +494,7 @@ export default function CheckoutPanel(props: Props) {
               </div>
               <button
                 className="primary"
-                disabled={pending || items.length === 0}
+                disabled={items.length === 0}
                 onClick={onCheckout}
               >
                 {pending ? (

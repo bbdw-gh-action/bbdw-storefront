@@ -95,8 +95,7 @@ export default function App() {
   }
 
   async function checkout() {
-    if (inFlight.current || order || items.length === 0) return;
-    inFlight.current = true;
+    if (order || items.length === 0) return;
     purchaseKey.current ??= crypto.randomUUID();
     setPending(true);
     setError(null);
