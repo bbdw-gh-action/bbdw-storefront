@@ -9,7 +9,24 @@
   },
   "sourceFiles": [
     "src/App.tsx",
-    "src/api.ts"
+    "src/api.ts",
+    "src/CheckoutPanel.tsx"
   ],
-  "testPattern": "^tests/patchwork-[a-z0-9-]+\\.spec\\.ts$"
+  "testPattern": "^tests/patchwork-[a-z0-9-]+\\.spec\\.ts$",
+  "handoff": {
+    "targets": [],
+    "sources": [
+      {
+        "repository": "bb-dw-26/bbdw-checkout",
+        "baseBranch": "main",
+        "scenario": "CHK-003",
+        "sentry": {
+          "org": "bbdw-workshop-jj",
+          "project": "bbdw-checkout",
+          "projectId": "4512294853869568"
+        }
+      }
+    ],
+    "receiveBranch": "demo/chk-003"
+  }
 }

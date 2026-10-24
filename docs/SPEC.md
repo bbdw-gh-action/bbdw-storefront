@@ -38,6 +38,8 @@ Durante o envio, as edições e novas submissões ficam bloqueadas. Fechar o pai
 
 ## Contratos comuns
 
+Cada intenção de compra usa um UUID no cabeçalho `Idempotency-Key` de `POST /orders`. A chave é preservada após falha, ao fechar/reabrir o painel e ao trocar o pagamento demonstrativo. Alterar cliente, modalidade ou itens renova a intenção; **Continuar comprando** também a limpa. O corpo JSON e os totais permanecem iguais. `X-Request-ID` é novo a cada tentativa; `X-Client-Release` informa `VITE_SENTRY_RELEASE` quando configurada. Nenhum desses cabeçalhos contém dados bancários ou pessoais. A chave dura somente durante a sessão da página.
+
 - HTTP/JSON, IDs como strings, valores monetários em centavos inteiros e moeda BRL.
 - Envelope de erro: `{"error":{"code":"CODIGO_ESTAVEL","message":"Mensagem legível"},"requestId":"identificador"}`.
 - Propagar `X-Request-ID` nas chamadas e respostas; gerar um identificador quando ausente.

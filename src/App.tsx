@@ -28,6 +28,7 @@ export default function App() {
   const [feedback, setFeedback] = useState("");
   const [pending, setPending] = useState(false);
   const inFlight = useRef(false);
+  const purchaseKey = useRef<string | null>(null);
   const cartButton = useRef<HTMLButtonElement>(null);
   const [error, setError] = useState<ApiError | null>(null);
   const [order, setOrder] = useState<Order | null>(null);
@@ -78,11 +79,13 @@ export default function App() {
       quantity > 99
     )
       return;
+    if ((cart[id] ?? 0) !== quantity) purchaseKey.current = null;
     setCart((previous) => ({ ...previous, [id]: quantity }));
     setError(null);
   }
 
   function continueShopping() {
+    purchaseKey.current = null;
     setCart({});
     setOrder(null);
     setError(null);
@@ -94,12 +97,19 @@ export default function App() {
   async function checkout() {
     if (inFlight.current || order || items.length === 0) return;
     inFlight.current = true;
+    purchaseKey.current ??= crypto.randomUUID();
     setPending(true);
     setError(null);
     try {
       const result = await request<Order>(`${urls.checkout}/orders`, {
         method: "POST",
-        headers: { "Content-Type": "application/json" },
+        headers: {
+          "Content-Type": "application/json",
+          "Idempotency-Key": purchaseKey.current,
+          ...(import.meta.env.VITE_SENTRY_RELEASE
+            ? { "X-Client-Release": import.meta.env.VITE_SENTRY_RELEASE }
+            : {}),
+        },
         body: JSON.stringify({
           customerId,
           fulfillment,
@@ -334,10 +344,12 @@ export default function App() {
         onQuantity={changeQuantity}
         onCustomer={(value) => {
           setCustomerId(value);
+          if (value !== customerId) purchaseKey.current = null;
           setError(null);
         }}
         onFulfillment={(value) => {
           setFulfillment(value);
+          if (value !== fulfillment) purchaseKey.current = null;
           setError(null);
         }}
         onPayment={(value) => {
